@@ -1,0 +1,3 @@
+ros2 control set_controller_state arm_controller inactive
+ros2 control set_controller_state cartesian_compliance_controller active
+

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:include filename="$(find denso_robot_description)/urdf/common.xacro" />
+    <xacro:macro name="robotiq_ati_flange" params="prefix parent *origin">
+        <link name="${prefix}robotiq_ati_flange_base_link">
+            <inertial>
+                <mass value="0.3"/>
+                <inertia  ixx="0.002385" ixy="0.00"  ixz="0.00" iyy="0.002385" iyz="0.00" izz="0.00027" />
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0.01245" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder length="0.0249" radius="0.041"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0.01245" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder length="0.0249" radius="0.041"/>
+                </geometry>
+            </collision>
+        </link>
+        <link name="${prefix}robotiq_ati_flange_link"/>
+        <joint name="${prefix}robotiq_ati_flange_base_joint" type="fixed">
+            <xacro:insert_block name="origin" />
+            <parent link="${parent}" />
+            <child link="${prefix}robotiq_ati_flange_base_link" />
+        </joint>
+        <joint name="${prefix}robotiq_ati_flange_joint" type="fixed">
+            <parent link="${prefix}robotiq_ati_flange_base_link" />
+            <child link="${prefix}robotiq_ati_flange_link" />
+            <origin xyz="0 0 0.0249" rpy="0 0 0" />
+        </joint>
+    </xacro:macro>
+</robot>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="hm_denso_robot">
+
+ <!-- Use this if parameters are set from the launch file, otherwise delete -->
+  <xacro:arg name="prefix" default="" />
+
+  <xacro:arg name="sim_gazebo" default="false" />
+  <xacro:arg name="robot_ip" default="192.168.0.100" />
+  <xacro:arg name="robot_port" default="5007"/>
+  <xacro:arg name="send_format" default="288"/>
+  <xacro:arg name="recv_format" default="292"/>
+  <xacro:arg name="config_file" default=""/>
+  <xacro:arg name="fake_hardware" default="false" />
+
+  <!-- Robotiq parameters -->
+  <xacro:arg name="g_enable" default="false" />
+  <xacro:arg name="g_com" default="/dev/ttyUSB0" />
+
+  <!-- Import Denso Robot Model -->
+  <xacro:include filename="$(find denso_robot_description)/urdf/denso_robot/denso_robot_macro.xacro"/>
+  <!-- Import your frame here to instead of table -->
+
+  <!-- Import Robot Hand -->
+  <xacro:include filename="$(find robotiq_description)/urdf/robotiq_2f_85_macro.urdf.xacro" />
+  <xacro:include filename="$(find hm_denso_description)/urdf/robotiq/robotiq_ati_flange.xacro" />
+
+  <!-- Import ATI sensor -->
+  <xacro:include filename="$(find hm_denso_description)/urdf/ati_sensor/ati_sensor.xacro"/>
+  
+  <!-- Import ROS2 Control -->
+  <xacro:include filename="$(find denso_robot_description)/urdf/denso_robot/denso_robot_macro.ros2_control.xacro"/>
+  <xacro:include filename="$(find hm_denso_description)/urdf/hm_denso_gazebo.ros2_control.xacro"/>  
+  <xacro:include filename="$(find robotiq_description)/urdf/2f_85.ros2_control.xacro" />
+  
+  <!-- Import Table -->
+  <xacro:include filename="$(find hm_denso_description)/urdf/table/table.xacro"/>
+
+  <!-- initial position for simulations (Fake Hardware, Gazebo, Ignition) -->
+  <xacro:arg name="initial_positions_file" default="$(find hm_denso_description)/config/initial_positions.yaml"/>
+
+  <!-- convert to property to use substitution in function -->
+  <xacro:property name="initial_positions_file" default="$(arg initial_positions_file)"/>
+
+  <!-- create link fixed to the "world" -->
+  <link name="world" />
+
+  <!-- Load table -->
+  <xacro:hm_denso_table parent="world"/>
+
+  <!-- Load Denso Robot and Robotic Hand -->
+  <xacro:denso_robot prefix="" parent="robot_base_link" >
+    <origin xyz="0 0.0 0" rpy="0 0 0" />           
+  </xacro:denso_robot>
+  <xacro:ati_sensor prefix="" parent="link6">
+    <origin xyz="0 0 0.0" rpy="0 0 ${-pi/2}" />
+  </xacro:ati_sensor>
+  <xacro:robotiq_ati_flange prefix="" parent="ati_sensor_link">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:robotiq_ati_flange>
+  <xacro:robotiq_gripper prefix="" name="RobotiqGripperHardwareInterface" parent="robotiq_ati_flange_link" include_ros2_control="false">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:robotiq_gripper>
+  <link name="end_link"/>
+  <joint name="end_joint" type="fixed">
+    <origin xyz="0 0 0.1582" rpy="0 0 0" />
+    <parent link="robotiq_85_base_link" />
+    <child link="end_link" />
+  </joint>
+
+
+  <!-- Load ros2 control -->
+  <!-- Real Robot control -->
+  <xacro:unless value="$(arg sim_gazebo)">
+
+    <!-- gripper -->
+    <xacro:robotiq_gripper_ros2_control
+    prefix=""
+    name="Robotiq" 
+    com_port="$(arg g_com)"/>
+
+    <!-- arm ros2 control -->
+    <xacro:denso_robot_ros2_control name="denso_control" 
+    prefix=""
+    sim_gazebo="$(arg sim_gazebo)" 
+    robot_ip="$(arg robot_ip)" 
+    robot_port="$(arg robot_port)"
+    send_format="$(arg send_format)" 
+    recv_format="$(arg recv_format)" 
+    config_file="$(arg config_file)"
+    use_fake_hardware="$(arg fake_hardware)"
+    mock_sensor_commands="$(arg fake_hardware)"
+    initial_positions="${xacro.load_yaml(initial_positions_file)}"/>
+  </xacro:unless>
+
+  <!-- Gazebo Control -->
+  <xacro:if value="$(arg sim_gazebo)">
+    <gazebo>
+      <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+        <parameters>$(find hm_denso_bringup)/config/hm_denso_gazebo_controllers.yaml</parameters>
+      </plugin>
+    </gazebo>
+    <xacro:hm_denso_gazebo_ros2_control name="hm_denso_control" initial_positions="${xacro.load_yaml(initial_positions_file)}"/>
+  </xacro:if>
+
+</robot>

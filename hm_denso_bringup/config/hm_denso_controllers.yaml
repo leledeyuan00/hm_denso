@@ -1,0 +1,109 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 150  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    forward_position_controller:
+      type: forward_command_controller/ForwardCommandController
+
+    arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    cartesian_compliance_controller:
+      type: cartesian_compliance_controller/CartesianComplianceController
+     
+    gripper_forward_position_controller:
+      type: forward_command_controller/ForwardCommandController
+    
+forward_position_controller:
+  ros__parameters:
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+    interface_name: position
+
+arm_controller:
+  ros__parameters:
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+cartesian_compliance_controller:
+  ros__parameters:
+    ik_solver: "forward_dynamics"
+    end_effector_link: "ati_sensor_link"
+    robot_base_link: "robot_base_link"
+    ft_sensor_ref_link: "ati_sensor_link"
+    compliance_ref_link: "ati_sensor_link"
+    hand_frame_control: false
+    force_enable: true
+    gravity_compensation: true
+    gravity_compensation_value: 
+      force: [-7.3705, -0.7647, -2.104, -2.3587]
+      torque: [0.0519, -0.1261, -0.0741, 0.3109]
+    emergency_stop_threshold: 200.0
+    joints:
+      - joint1
+      - joint2
+      - joint3
+      - joint4
+      - joint5
+      - joint6
+
+    # Choose: position or velocity.
+    command_interfaces:
+      - position
+        #- velocity
+
+    stiffness:  # w.r.t. compliance_ref_link
+        trans_x: 100.0
+        trans_y: 100.0
+        trans_z: 100.0
+        rot_x: 10.0
+        rot_y: 10.0
+        rot_z: 10.0
+    
+    damping:
+        trans_x: 0.0
+        trans_y: 0.0
+        trans_z: 2.0
+        rot_x: 0.0
+        rot_y: 0.0
+        rot_z: 0.0
+
+    solver:
+        forward_dynamics:
+          link_mass: 100.0
+        error_scale: 0.5
+        iterations: 1
+        publish_state_feedback: true
+
+    pd_gains:
+        trans_x: {p: 1.0, d: 0.2} # p: 0.1 is useful for contact table
+        trans_y: {p: 1.0, d: 0.2}
+        trans_z: {p: 1.0, d: 0.05}
+        rot_x: {p: 10.0, d: 0.02}
+        rot_y: {p: 10.0, d: 0.02}
+        rot_z: {p: 10.0, d: 0.02}
+
+
+gripper_forward_position_controller:
+  ros__parameters:
+    joints:
+      - robotiq_85_left_knuckle_joint
+    interface_name: position
