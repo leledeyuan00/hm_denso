@@ -41,7 +41,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "controllers_file",
-            default_value="hm_denso_controllers_controllers.yaml",
+            default_value="hm_denso_controllers.yaml",
             description="YAML file with the controllers configuration.",
         )
     )
