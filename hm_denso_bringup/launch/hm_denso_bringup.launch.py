@@ -123,7 +123,7 @@ def generate_launch_description():
         DeclareLaunchArgument(
             "g_enable",
             default_value="true",
-            description="Select which Robotiq gripper to start. The parameters are ['dual', 'left', 'right', 'none']",
+            description="Whether to enable the gripper.",
         )
     )
     declared_arguments.append(
@@ -244,14 +244,12 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner",
         arguments=["gripper_forward_position_controller", "-c", "/controller_manager"],
+        condition = IfCondition(g_enable),
     )
 
     # Gazebo
     gazebo_world_file = PathJoinSubstitution(
         [FindPackageShare(description_package), "gazebo", "hm_denso_world.sdf"])
-
-    gazebo_gui_config_fsile = PathJoinSubstitution(
-        [FindPackageShare(description_package), "gazebo", "hm_denso_gui.config"])
 
     gazebo_node = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(

@@ -72,11 +72,13 @@
   <!-- Real Robot control -->
   <xacro:unless value="$(arg sim_gazebo)">
 
-    <!-- gripper -->
-    <xacro:robotiq_gripper_ros2_control
-    prefix=""
-    name="Robotiq" 
-    com_port="$(arg g_com)"/>
+    <xacro:if value="$(arg g_enable)">
+      <!-- gripper -->
+      <xacro:robotiq_gripper_ros2_control
+      prefix=""
+      name="Robotiq" 
+      com_port="$(arg g_com)"/>
+    </xacro:if>
 
     <!-- arm ros2 control -->
     <xacro:denso_robot_ros2_control name="denso_control" 
