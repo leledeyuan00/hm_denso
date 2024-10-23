@@ -16,6 +16,8 @@
   <depend>std_srvs</depend>
   <depend>cartesian_controller_msgs</depend>
   <depend>tf2_eigen</depend>
+  <depend>tf2_kdl</depend>
+  <depend>hm_motion_base</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

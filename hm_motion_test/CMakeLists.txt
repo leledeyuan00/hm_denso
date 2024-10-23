@@ -14,6 +14,8 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   std_srvs
   cartesian_controller_msgs
   tf2_eigen
+  tf2_kdl
+  hm_motion_base
 )
 
 # find dependencies
