@@ -171,9 +171,10 @@ void HmMotionBase::task_execute()
     }
 }
 
-void HmMotionBase::task_pushback(std::shared_ptr<hm_research::HmTask> task)
+uint8_t HmMotionBase::task_pushback(std::shared_ptr<hm_research::HmTask> task)
 {        
     tasks_vector_.push_back(task);
+    return tasks_vector_.size() - 1;
 }
 
 // Start the control loop
@@ -201,7 +202,7 @@ void HmMotionBase::control_loop()
                 robotiq_pub_->publish(robot_.robotiq);
             }
         }
-
+        rate.sleep();
     }
 }
 

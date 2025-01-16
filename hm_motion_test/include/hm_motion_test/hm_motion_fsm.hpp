@@ -45,6 +45,8 @@ private:
     // calibration
     Eigen::Isometry3d calibration_matrix_r_;
 
+    uint8_t test_task_num_;
+
 };
 
 } // namespace hm_research

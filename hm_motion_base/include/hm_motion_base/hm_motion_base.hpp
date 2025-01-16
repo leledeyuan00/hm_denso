@@ -128,12 +128,25 @@ protected:
     * @brief Push back the task, the task is derived from HmTaskBase
     * @param task 
     */
-    void task_pushback(std::shared_ptr<hm_research::HmTask> task);
+    uint8_t task_pushback(std::shared_ptr<hm_research::HmTask> task);
     virtual void tasks_init() = 0;
     void task_execute();
 
     /// @brief set the task finished
-    void set_task_finished(){tasks_vector_[system_state_.task_num]->set_state(HmTaskState::FINISH);};
+    void set_task_finished(){
+        next_task_offset_ = 1;
+        tasks_vector_[system_state_.task_num]->set_state(HmTaskState::FINISH);
+    };
+    void goto_specific_task(uint8_t task_num){
+        next_task_offset_ = task_num - system_state_.task_num;
+        tasks_vector_[system_state_.task_num]->set_state(HmTaskState::FINISH);
+    };
+    void goto_init_task(){
+        goto_specific_task(0);
+    };
+    void goto_last_task(){
+        goto_specific_task(tasks_vector_.size()-1);
+    };
 
     // states
     std::shared_ptr<HmFlags> system_flags_;
@@ -141,7 +154,8 @@ protected:
     inline bool check_init() { return initialized_; }
 
     SystemState system_state_; // current task number, current time, start time
-
+    uint8_t next_task_offset_ = 1;
+    
     // std
     std::thread control_loop_thread_;
 

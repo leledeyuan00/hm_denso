@@ -93,7 +93,7 @@ void HmMotionFsm::tasks_init()
     }));
 
     // Move back
-    task_pushback(TaskPtr("Move back", [this](){
+    test_task_num_ = task_pushback(TaskPtr("Move back", [this](){
         geometry_msgs::msg::PoseStamped pose;
         pose = get_robot_state().start_pose;
 
@@ -103,7 +103,7 @@ void HmMotionFsm::tasks_init()
             set_task_finished();
         }
     }));
-
+    
     // Log Test
     task_pushback(TaskPtr("Log Test", [this](){
         RCLCPP_INFO(this->get_logger(), "Log Test");
@@ -115,6 +115,9 @@ void HmMotionFsm::tasks_init()
         RCLCPP_INFO(this->get_logger(), "Current system task number is: %d", system_state.task_num);
         RCLCPP_INFO(this->get_logger(), "Current system start time is: %f", system_state.start_time.seconds());
         RCLCPP_INFO(this->get_logger(), "Current system current time is: %f", system_state.current_time.seconds());
+
+        RCLCPP_INFO(this->get_logger(), "Test task number is: %d", test_task_num_);
+        RCLCPP_INFO(this->get_logger(), "You could use this task number to jump to the task by calling goto_specific_task(task_num) \r\n Goto the initial task by calling goto_init_task() \r\n Goto the last task by calling goto_last_task()");
 
         set_task_finished();
     }));
@@ -140,6 +143,13 @@ void HmMotionFsm::tasks_init()
         }
         else
         {
+            set_task_finished();
+        }
+    }));
+
+    // Am example for task with sleep function
+    task_pushback(TaskPtr("Sleep Test", [this](){
+        if (sleep(0.5)){
             set_task_finished();
         }
     }));
